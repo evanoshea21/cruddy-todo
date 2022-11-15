@@ -6,11 +6,38 @@ const counter = require('./counter');
 var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
+exports.create = (text, callback) => {//this CB is when CREATE is called
 
-exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
-  items[id] = text;
-  callback(null, { id, text });
+  counter.getNextUniqueId((error, counterString) => {
+    if(error) {
+      callback(new Error('error'))
+    } else {
+      var filePath = exports.dataDir + `/${counterString}.txt`;
+      console.log('this is the path,   ', filePath);
+      fs.writeFile(filePath , text, (err, data) => {
+        if (err) {
+          console.log(err);
+        } else {
+          var obj = {id: counterString, text: text}
+          callback(null, obj);
+          console.log("File written successfully with data->", data);
+        }
+      })
+    }
+})
+  // counter.getNextUniqueId( (err, data) => {
+  //   if (err) {
+  //     console.log('error');
+  //   } else {
+  //     fs.writeFile(`./data/data.txt`, text, (err, fileData) => {
+  //       if(err) {
+  //         console.log('error:   ', err);
+  //       } else {
+  //         callback(null, fileData);
+  //       }
+  //     })
+  //   }
+  // });
 };
 
 exports.readAll = (callback) => {
